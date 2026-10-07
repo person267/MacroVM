@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedded Micro-VM Sandbox</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: #161b22;
+            border: 1px border #30363d;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        h1 {
+            color: #58a6ff;
+            margin-top: 0;
+            font-size: 24px;
+        }
+        p {
+            color: #8b949e;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        #screen {
+            white-space: pre;
+            font-family: "Courier New", Courier, monospace;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 16px;
+            background-color: #000000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px solid #30363d;
+            height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+            box-shadow: inset 0 0 10px rgba(0,255,0,0.2);
+        }
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            background-color: #238636;
+            color: #ffffff;
+            border: 1px solid rgba(240,246,252,0.1);
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #2ea043;
+        }
+        button:disabled {
+            background-color: #213527;
+            color: #486551;
+            cursor: not-allowed;
+        }
+        .status {
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+    <!-- Include the compiled copy of copy86 emulator script framework -->
+    <script src="https://copy.sh/v86/build/libv86.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1>Embedded Linux WebAssembly (WASM) Engine</h1>
+    <p>This page embeds a live, sandboxed 32-bit x86 emulator running completely inside your browser using <strong>WebAssembly (WASM)</strong> via the <strong>v86 architecture</strong> framework. No cloud servers are utilized—the terminal below executes entirely local within the browser window pipeline.</p>
+    
+    <div class="controls">
+        <button id="boot-btn" onclick="bootVM()">Launch Micro-VM</button>
+    </div>
+    
+    <div id="status-log" class="status">System state: Standby (Click launch to fetch micro-kernel)</div>
+
+    <!-- The emulator canvas terminal console text block container -->
+    <div id="screen"></div>
+</div>
+
+<script>
+    function bootVM() {
+        const btn = document.getElementById("boot-btn");
+        const status = document.getElementById("status-log");
+        
+        btn.disabled = true;
+        status.innerText = "Status: Downloading floppy image & initialization components...";
+        
+        // Initialize the browser-embedded engine using a lightweight 1.44MB Linux floppy target image
+        var emulator = new V86Starter({
+            screen_container: document.getElementById("screen"),
+            bios: { url: "https://copy.sh/v86/bios/seabios.bin" },
+            fda: { url: "https://copy.sh/v86/images/linux.img" },
+            autostart: true
+        });
+        
+        status.innerText = "Status: Bootloader active. Emulating x86 instruction stack local...";
+    }
+</script>
+
+</body>
+</html>
